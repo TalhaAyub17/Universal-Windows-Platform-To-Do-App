@@ -1,0 +1,118 @@
+﻿<Page
+    x:Class="TodoApp.Views.TodoListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:TodoApp.Controls"
+    xmlns:converters="using:TodoApp.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:entities="using:TodoApp.Shared.Models.Entity"
+    xmlns:local="using:TodoApp.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource AppBackgroundBrush}"
+    Loaded="{x:Bind ViewModel.PageLoaded}"
+    NavigationCacheMode="Enabled"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <MenuFlyout x:Name="todoItemFlyout">
+            <MenuFlyoutItem Click="DeleteTodoButton_Click" Text="Delete to-do">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon FontFamily="{StaticResource FluentUIGlyphs}" Glyph="&#xE9ED;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                x:Name="viewDetailsMenuItem"
+                Click="ViewDetailsMenuItem_Click"
+                Text="View details">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon FontFamily="{StaticResource FluentUIGlyphs}" Glyph="&#xE91F;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+
+        <Style x:Key="TodoListItemStyle" TargetType="Grid">
+            <Setter Property="Padding" Value="15,11,15,11" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="FlyoutBase.AttachedFlyout" Value="{StaticResource todoItemFlyout}" />
+        </Style>
+
+        <converters:ValueToVisibilityConverter x:Name="ValueToVisiblityConverter" />
+    </Page.Resources>
+
+    <Grid Grid.Row="1" Background="{ThemeResource ContentDialogBorderThemeBrush}">
+        <Grid Margin="20,0,20,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ListView
+                x:Name="todoList"
+                ItemsSource="{x:Bind ViewModel.Todos}"
+                SelectionChanged="ListView_SelectionChanged"
+                SelectionMode="Single" Opacity="0.8" FocusVisualPrimaryBrush="#E4000000">
+                <!--  Item template  -->
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="entities:Todo">
+                        <Grid RightTapped="Grid_RightTapped" Style="{StaticResource TodoListItemStyle}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <CheckBox
+                                MinWidth="0"
+                                Padding="0"
+                                Click="CheckBox_Click"
+                                CornerRadius="10"
+                                IsChecked="{x:Bind IsCompleted}" />
+
+                            <Grid
+                                Grid.Column="1"
+                                Margin="15,0,0,0"
+                                VerticalAlignment="Center">
+                                <TextBlock Text="{x:Bind Name}" />
+                                <TextBlock Text="{x:Bind Note}" />
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
+                <!--  Item style  -->
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalAlignment" Value="Stretch" />
+                        <Setter Property="Margin" Value="-11,3,-11,0" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+
+            <Grid Grid.Row="1" Margin="0,10,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    x:Name="todoNameTextBox"
+                    Margin="0,0,15,0"
+                    KeyDown="TextBox_KeyDown"
+                    PlaceholderText="Enter to-do name..."
+                    Text="{x:Bind ViewModel.TodoName, Mode=TwoWay}" />
+                <Button Grid.Column="1" Click="Button_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon FontFamily="{StaticResource FluentUIGlyphs}" Glyph="&#xE903;" />
+                        <TextBlock Margin="3,2,0,0" Text="Add to-do" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Grid>
+
+        <controls:InAppNotification
+            x:Name="notification"
+            Margin="10,0,10,14"
+            Canvas.ZIndex="1" />
+    </Grid>
+</Page>
